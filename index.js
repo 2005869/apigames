@@ -61,6 +61,20 @@ app.get('/game/:id', (req, res) => {
     }
 });
 
+// add a game
+app.post('/game', (req, res) => {
+    var {id, title, year, price} = req.body;
+
+    DB.games.push({
+        id: id,
+        title,
+        price,
+        year
+    });
+
+    res.sendStatus(200);
+});
+
 
 app.listen(45678, () => {
     console.log('api run');
