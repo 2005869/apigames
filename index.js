@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const game = require('./database/database');
 
 const bodyParser = require('body-parser');
 
@@ -38,9 +39,13 @@ var DB = {
 //Rotes
 
 // list all games 
-app.get('/games', (req, res) => {
-    res.statusCode = 200;
-    res.json(DB.games);
+app.get("/games", (req, res) => {
+    game.findAll({raw: true, order: [
+        ['id', 'DESC'] 
+    ]}).then(games => {
+        res.json(games)
+    });
+    
 });
 
 // return one game
@@ -63,16 +68,15 @@ app.get('/game/:id', (req, res) => {
 
 // add a game
 app.post('/game', (req, res) => {
-    var {id, title, year, price} = req.body;
+    var {title, year, price} = req.body;
 
-    DB.games.push({
-        id: id,
-        title,
-        price,
-        year
+    game.create({
+        title: title,
+        year: year,
+        price: price
+    }).then(() => {
+        res.sendStatus(200);
     });
-
-    res.sendStatus(200);
 });
 
 // delete game
