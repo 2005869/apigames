@@ -36,8 +36,11 @@ var DB = {
 }
 
 //Rotes
-app.get('/', () => {
-    
+
+// list all games 
+app.get('/games', (req, res) => {
+    res.statusCode = 200;
+    res.json(DB.games);
 });
 
 
