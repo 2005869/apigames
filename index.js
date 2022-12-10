@@ -44,6 +44,8 @@ app.get("/games", (req, res) => {
         ['id', 'DESC'] 
     ]}).then(games => {
         res.json(games)
+    }).catch(() => {
+        res.sendStatus(400);
     });
     
 });
@@ -55,16 +57,20 @@ app.get('/game/:id', (req, res) => {
     }else{
         var id = parseInt(req.params.id);
 
-        var game = DB.games.find(g => g.id == id);
-
-        if (game != undefined){
-            res.statusCode == 200;
-            res.json(game);
-        }else{
-            res.sendStatus(404);
-        }
+        game.findOne({
+            where: {id: id}
+        }).then(game => {
+            if (game != undefined){
+                res.json(game);
+                res.status(200)
+            }else{
+                res.sendStatus(400);
+            }
+        });
     }
 });
+
+
 
 // add a game
 app.post('/game', (req, res) => {
@@ -86,14 +92,15 @@ app.delete('/game/:id', (req, res) => {
     }else{
         var id = parseInt(req.params.id);
 
-        var index = DB.games.findIndex(g => g.id == id);
-
-        if (index == -1){
-            res.sendStatus(404);
-        }else{
-            DB.games.splice(index, 1);
-            res.sendStatus(200);
-        }
+        game.findOne({where: {id: id}}).then(gameid => {
+            if (gameid != undefined){
+                gameid.destroy();
+                res.sendStatus(200);
+            }
+            else{
+                res.sendStatus(400);
+            }
+        });
     }
 });
 
@@ -104,27 +111,27 @@ app.put('/game/:id', (req, res) => {
     }else{
         var id = parseInt(req.params.id);
 
-        var game = DB.games.find(g => g.id == id);
+        game.findOne({where: {id: id}}).then(gameid => {
+            if (gameid != undefined){
 
-        if (game != undefined){
-            var {title, year, price} = req.body;
+                var {title, year, price} = req.body;
 
-            if (title != undefined){
-                game.title = title;
+                if (title != undefined){
+                    gameid.update({title: title});
+                }
+    
+                if (year != undefined){
+                    gameid.update({year: year});
+                }
+    
+                if (price != undefined){
+                    gameid.update({price: price});
+                }
+                res.sendStatus(200);
+            }else{
+                res.sendStatus(400);
             }
-
-            if (year != undefined){
-                game.year = year;
-            }
-
-            if (price != undefined){
-                game.price = price;
-            }
-
-            res.sendStatus(200);
-        }else{
-            res.sendStatus(404);
-        }
+        });
     }
 });
 
