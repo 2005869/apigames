@@ -23,4 +23,4 @@ Game.sync({force: false}).then(() => {
     console.log('create table');
 });
 
-module.exports = Game;
+module.exports = {Game, connection};

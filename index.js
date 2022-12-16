@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const game = require('./database/database');
 const cors = require('cors');
+const UsersController = require('./users/UsersController');
 
 const bodyParser = require('body-parser');
 
@@ -9,12 +10,13 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 app.use(cors());
 
+app.use('/', UsersController);
 
 //Rotes
 
 // list all games 
 app.get("/games", (req, res) => {
-    game.findAll({raw: true, order: [
+    game.Game.findAll({raw: true, order: [
         ['id', 'DESC'] 
     ]}).then(games => {
         res.json(games)
@@ -31,7 +33,7 @@ app.get('/game/:id', (req, res) => {
     }else{
         var id = parseInt(req.params.id);
 
-        game.findOne({
+        game.Game.findOne({
             where: {id: id}
         }).then(game => {
             if (game != undefined){
@@ -50,7 +52,7 @@ app.get('/game/:id', (req, res) => {
 app.post('/game', (req, res) => {
     var {title, year, price} = req.body;
 
-    game.create({
+    game.Game.create({
         title: title,
         year: year,
         price: price
@@ -66,7 +68,7 @@ app.delete('/game/:id', (req, res) => {
     }else{
         var id = parseInt(req.params.id);
 
-        game.findOne({where: {id: id}}).then(gameid => {
+        game.Game.findOne({where: {id: id}}).then(gameid => {
             if (gameid != undefined){
                 gameid.destroy();
                 res.sendStatus(200);
@@ -85,7 +87,7 @@ app.put('/game/:id', (req, res) => {
     }else{
         var id = parseInt(req.params.id);
 
-        game.findOne({where: {id: id}}).then(gameid => {
+        game.Game.findOne({where: {id: id}}).then(gameid => {
             if (gameid != undefined){
 
                 var {title, year, price} = req.body;
